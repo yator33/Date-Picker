@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react"
-import { addMonths, format } from "date-fns"
+import { addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, isToday, startOfWeek } from "date-fns"
+import { startOfMonth } from "date-fns/startOfMonth"
 
 
 
@@ -19,6 +20,12 @@ export function DatePicker({ value, onChange }){
 
 function DatePickerModel({value, onChange}){
   const[visibleMonth, setVisibleMonth] = useState(value || new Date())
+
+  const visibleDates = eachDayOfInterval({
+    start: startOfWeek(startOfMonth(visibleMonth)),
+    end: endOfWeek(endOfMonth(visibleMonth))
+
+  })
 
   function showPreviousMonth(){
     setVisibleMonth(currentMonth => {
@@ -53,7 +60,16 @@ function DatePickerModel({value, onChange}){
           <div>Sat</div>
         </div>
         <div className="date-picker-grid-dates date-picker-grid">
-          <button className="date date-picker-other-month-date">28</button>
+
+          {visibleDates.map(date => (
+            <button onClick={()=> onChange(date)} 
+            className={`date ${!isSameMonth(date, visibleMonth) 
+              && "date date-picker-other-month-date"
+            } ${isSameDay(date, value) && "selected"} ${isToday(date) && "today"}`}key={date.toDateString}>
+              {date.getDate()}
+            </button>
+          ))}
+          {/* <button className="date date-picker-other-month-date">28</button>
           <button className="date date-picker-other-month-date">29</button>
           <button className="date date-picker-other-month-date">30</button>
           <button className="date date-picker-other-month-date">31</button>
@@ -87,7 +103,7 @@ function DatePickerModel({value, onChange}){
           <button className="date">28</button>
           <button className="date today">29</button>
           <button className="date">30</button>
-          <button className="date date-picker-other-month-date">1</button>
+          <button className="date date-picker-other-month-date">1</button> */}
         </div>
       </div>
   )
